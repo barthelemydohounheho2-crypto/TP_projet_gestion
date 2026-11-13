@@ -1,0 +1,442 @@
+=====================================================================
+ CODES UML DES DIAGRAMMES DE CLASSES - Agence de voyage (Cotonou)
+=====================================================================
+ PlantUML : coller sur https://www.plantuml.com/plantuml
+ Mermaid  : coller sur https://mermaid.live (ou dans un README GitHub)
+
+
+=====================================================================
+ DIAGRAMME 1 : VERSION SIMPLIFIEE (celle du document)
+=====================================================================
+
+---------------------------------------------------------------------
+ 1.1) PlantUML
+---------------------------------------------------------------------
+
+@startuml
+skinparam classAttributeIconSize 0
+
+class Passager {
+    - idPassager : int
+    - nom : String
+    - prenom : String
+    - numeroPasseport : String
+    - telephone : String
+    - email : String
+    + creerPassager()
+    + afficherInfos()
+}
+
+class Avion {
+    - idAvion : int
+    - modele : String
+    - capaciteTotale : int
+    + verifierDisponibilite()
+}
+
+class Vol {
+    - idVol : int
+    - numeroVol : String
+    - villeDepart : String
+    - villeArrivee : String
+    - dateDepart : DateTime
+    - prixBase : double
+    - placesDisponibles : int
+    - statut : StatutVol
+    + creerVol()
+    + calculerPlacesRestantes()
+    + estComplet() : boolean
+}
+
+class Reservation {
+    - idReservation : int
+    - dateReservation : Date
+    - classe : ClasseVol
+    - nombrePlaces : int
+    - prixTotal : double
+    - statut : StatutReservation
+    + calculerPrixTotal()
+    + confirmerReservation()
+    + annulerReservation()
+}
+
+class Billet {
+    - idBillet : int
+    - numeroBillet : String
+    - dateEmission : Date
+    + genererBillet()
+    + imprimerBillet()
+}
+
+class Paiement {
+    - idPaiement : int
+    - montant : double
+    - modePaiement : ModePaiement
+    - statut : StatutPaiement
+    + effectuerPaiement()
+    + rembourser()
+}
+
+class Annulation {
+    - idAnnulation : int
+    - dateAnnulation : Date
+    - motif : String
+    - montantRembourse : double
+    + calculerRemboursement()
+}
+
+Passager "1" -- "*" Reservation : effectue >
+Vol "1" -- "*" Reservation : concerne >
+Avion "1" -- "*" Vol : assure >
+Reservation "1" -- "1..*" Billet : génère >
+Reservation "1" -- "1" Paiement : est payée par >
+Reservation "1" -- "0..1" Annulation : subit >
+
+@enduml
+
+
+---------------------------------------------------------------------
+ 1.2) Mermaid
+---------------------------------------------------------------------
+
+classDiagram
+  class Passager {
+    -int idPassager
+    -String nom
+    -String prenom
+    -String numeroPasseport
+    -String telephone
+    -String email
+    +creerPassager()
+    +afficherInfos()
+  }
+  class Avion {
+    -int idAvion
+    -String modele
+    -int capaciteTotale
+    +verifierDisponibilite()
+  }
+  class Vol {
+    -int idVol
+    -String numeroVol
+    -String villeDepart
+    -String villeArrivee
+    -DateTime dateDepart
+    -double prixBase
+    -int placesDisponibles
+    -StatutVol statut
+    +creerVol()
+    +calculerPlacesRestantes()
+    +estComplet() boolean
+  }
+  class Reservation {
+    -int idReservation
+    -Date dateReservation
+    -ClasseVol classe
+    -int nombrePlaces
+    -double prixTotal
+    -StatutReservation statut
+    +calculerPrixTotal()
+    +confirmerReservation()
+    +annulerReservation()
+  }
+  class Billet {
+    -int idBillet
+    -String numeroBillet
+    -Date dateEmission
+    +genererBillet()
+    +imprimerBillet()
+  }
+  class Paiement {
+    -int idPaiement
+    -double montant
+    -ModePaiement modePaiement
+    -StatutPaiement statut
+    +effectuerPaiement()
+    +rembourser()
+  }
+  class Annulation {
+    -int idAnnulation
+    -Date dateAnnulation
+    -String motif
+    -double montantRembourse
+    +calculerRemboursement()
+  }
+  Passager "1" --> "*" Reservation : effectue
+  Vol "1" --> "*" Reservation : concerne
+  Avion "1" --> "*" Vol : assure
+  Reservation "1" --> "1..*" Billet : génère
+  Reservation "1" --> "1" Paiement : est payée par
+  Reservation "1" --> "0..1" Annulation : subit
+
+
+=====================================================================
+ DIAGRAMME 2 : VERSION COMPLETE (alignee sur le code C++)
+=====================================================================
+
+---------------------------------------------------------------------
+ 2.1) PlantUML
+---------------------------------------------------------------------
+
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+enum StatutVol { PREVU  ANNULE  TERMINE }
+enum ClasseVol { ECONOMIQUE  AFFAIRES }
+enum StatutReservation { CONFIRMEE  EN_ATTENTE  ANNULEE }
+enum StatutBillet { VALIDE  UTILISE  ANNULE }
+enum ModePaiement { MTN_MOMO  MOOV_MONEY  ESPECES  CARTE }
+enum StatutPaiement { PAYE  EN_ATTENTE  ECHOUE  REMBOURSE }
+
+class Passager {
+    - idPassager : int
+    - nom : String
+    - prenom : String
+    - dateNaissance : Date
+    - numeroPasseport : String {unique}
+    - telephone : String
+    - email : String
+    - nationalite : String
+    + creerPassager()
+    + modifierPassager()
+    + afficherInfos()
+    + {static} rechercherParPasseport() : Passager
+}
+
+class Avion {
+    - idAvion : int
+    - modele : String
+    - capaciteTotale : int
+    - compagnie : String
+    + creerAvion()
+    + verifierDisponibilite() : boolean
+    + afficherAvion()
+}
+
+class Vol {
+    - idVol : int
+    - numeroVol : String
+    - villeDepart : String
+    - villeArrivee : String
+    - dateDepart : DateTime
+    - dateArrivee : DateTime
+    - prixBase : double
+    - placesDisponibles : int
+    - statut : StatutVol
+    + creerVol()
+    + modifierVol()
+    + annulerVol()
+    + calculerPlacesRestantes() : int
+    + estComplet() : boolean
+    + afficherVol()
+}
+
+class Reservation {
+    - idReservation : int
+    - dateReservation : Date
+    - classe : ClasseVol
+    - nombrePlaces : int
+    - sieges : int[1..*]
+    - prixTotal : double
+    - statut : StatutReservation
+    + creerReservation()
+    + calculerPrixTotal()
+    + confirmerReservation()
+    + annulerReservation()
+    + afficherReservation()
+}
+
+class Billet {
+    - idBillet : int
+    - numeroBillet : String {unique}
+    - siege : int
+    - dateEmission : Date
+    - statut : StatutBillet
+    + genererBillet()
+    + imprimerBillet()
+    + validerBillet()
+}
+
+class Paiement {
+    - idPaiement : int
+    - montant : double
+    - datePaiement : Date
+    - modePaiement : ModePaiement
+    - statut : StatutPaiement
+    + effectuerPaiement()
+    + verifierPaiement() : boolean
+    + rembourser()
+    + genererRecu()
+}
+
+class Annulation {
+    - idAnnulation : int
+    - dateAnnulation : Date
+    - motif : String
+    - montantRembourse : double
+    - fraisAnnulation : double
+    + {static} TAUX_FRAIS : double = 0.20
+    + calculerRemboursement()
+    + enregistrerAnnulation()
+    + afficherAnnulation()
+}
+
+Passager "1" -- "*" Reservation : effectue >
+Vol "1" -- "*" Reservation : concerne >
+Avion "1" -- "*" Vol : assure >
+Reservation "1" -- "1..*" Billet : génère >
+Reservation "1" -- "0..1" Paiement : est payée par >
+Reservation "1" -- "0..1" Annulation : subit >
+Paiement "1" -- "0..1" Annulation : est remboursé par >
+
+Vol ..> StatutVol
+Reservation ..> ClasseVol
+Reservation ..> StatutReservation
+Billet ..> StatutBillet
+Paiement ..> ModePaiement
+Paiement ..> StatutPaiement
+
+@enduml
+
+
+---------------------------------------------------------------------
+ 2.2) Mermaid
+---------------------------------------------------------------------
+
+classDiagram
+  class Passager {
+    -int idPassager
+    -String nom
+    -String prenom
+    -Date dateNaissance
+    -String numeroPasseport
+    -String telephone
+    -String email
+    -String nationalite
+    +creerPassager()
+    +modifierPassager()
+    +afficherInfos()
+    +rechercherParPasseport() Passager$
+  }
+  class Avion {
+    -int idAvion
+    -String modele
+    -int capaciteTotale
+    -String compagnie
+    +creerAvion()
+    +verifierDisponibilite() boolean
+    +afficherAvion()
+  }
+  class Vol {
+    -int idVol
+    -String numeroVol
+    -String villeDepart
+    -String villeArrivee
+    -DateTime dateDepart
+    -DateTime dateArrivee
+    -double prixBase
+    -int placesDisponibles
+    -StatutVol statut
+    +creerVol()
+    +modifierVol()
+    +annulerVol()
+    +calculerPlacesRestantes() int
+    +estComplet() boolean
+    +afficherVol()
+  }
+  class Reservation {
+    -int idReservation
+    -Date dateReservation
+    -ClasseVol classe
+    -int nombrePlaces
+    -int[] sieges
+    -double prixTotal
+    -StatutReservation statut
+    +creerReservation()
+    +calculerPrixTotal()
+    +confirmerReservation()
+    +annulerReservation()
+    +afficherReservation()
+  }
+  class Billet {
+    -int idBillet
+    -String numeroBillet
+    -int siege
+    -Date dateEmission
+    -StatutBillet statut
+    +genererBillet()
+    +imprimerBillet()
+    +validerBillet()
+  }
+  class Paiement {
+    -int idPaiement
+    -double montant
+    -Date datePaiement
+    -ModePaiement modePaiement
+    -StatutPaiement statut
+    +effectuerPaiement()
+    +verifierPaiement() boolean
+    +rembourser()
+    +genererRecu()
+  }
+  class Annulation {
+    -int idAnnulation
+    -Date dateAnnulation
+    -String motif
+    -double montantRembourse
+    -double fraisAnnulation
+    +calculerRemboursement()
+    +enregistrerAnnulation()
+    +afficherAnnulation()
+  }
+  class StatutVol {
+    <<enumeration>>
+    PREVU
+    ANNULE
+    TERMINE
+  }
+  class ClasseVol {
+    <<enumeration>>
+    ECONOMIQUE
+    AFFAIRES
+  }
+  class StatutReservation {
+    <<enumeration>>
+    CONFIRMEE
+    EN_ATTENTE
+    ANNULEE
+  }
+  class StatutBillet {
+    <<enumeration>>
+    VALIDE
+    UTILISE
+    ANNULE
+  }
+  class ModePaiement {
+    <<enumeration>>
+    MTN_MOMO
+    MOOV_MONEY
+    ESPECES
+    CARTE
+  }
+  class StatutPaiement {
+    <<enumeration>>
+    PAYE
+    EN_ATTENTE
+    ECHOUE
+    REMBOURSE
+  }
+  Passager "1" --> "*" Reservation : effectue
+  Vol "1" --> "*" Reservation : concerne
+  Avion "1" --> "*" Vol : assure
+  Reservation "1" --> "1..*" Billet : génère
+  Reservation "1" --> "0..1" Paiement : est payée par
+  Reservation "1" --> "0..1" Annulation : subit
+  Paiement "1" --> "0..1" Annulation : est remboursé par
+  Vol ..> StatutVol
+  Reservation ..> ClasseVol
+  Reservation ..> StatutReservation
+  Billet ..> StatutBillet
+  Paiement ..> ModePaiement
+  Paiement ..> StatutPaiement
